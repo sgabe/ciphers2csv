@@ -38,9 +38,9 @@ args = parser.parse_args()
 
 results = collections.defaultdict(nested_dict)
 
-if not os.path.isfile(args.i) or not args.i.endswith('.xml'):
+if not os.path.isfile(args.i) or not args.i.endswith('.nessus'):
   parser.print_help()
-  print('\n[!] XML output file required...')
+  print('\n[!] Nessus output file required...')
   exit(1)
 
 print(description)
