@@ -9,8 +9,8 @@ and affected hosts.
 
 __description__ = 'Parse supported SSL cipher suites from Nessus output'
 __author__ = 'Gabor Seljan'
-__version__ = '0.1.1'
-__date__ = '2016/11/02'
+__version__ = '0.1.2'
+__date__ = '2019/05/01'
 
 import re
 import os
@@ -33,6 +33,7 @@ banner = ("""
 """)
 
 print(banner)
+print('Version', __version__)
 
 parser = ArgumentParser(
     formatter_class=RawDescriptionHelpFormatter,
@@ -53,6 +54,8 @@ if not os.path.isfile(args.i) or not args.i.endswith('.nessus'):
     print('\n[!] Nessus output file required...')
     exit(1)
 
+blacklisted_modules = ('ssl_cbc_supported_cipher', 'ssl_pfs_supported_ciphers')
+
 root = ET.parse(args.i).getroot()
 report = root.find('Report')
 for host in report.findall('ReportHost'):
@@ -60,7 +63,7 @@ for host in report.findall('ReportHost'):
     for item in host.findall('ReportItem'):
         port = item.get('port')
         fname = item.find('fname').text
-        if 'ssl' in fname and item.find('plugin_output') is not None:
+        if 'ssl' in fname and fname not in blacklisted_modules and item.find('plugin_output') is not None:
             text = item.find('plugin_output').text
             for i in re.compile('^SSL Version : ', re.M).split(text):
                 i = re.sub(' +', ' ', i.strip())
